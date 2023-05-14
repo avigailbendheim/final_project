@@ -1,34 +1,47 @@
 import sqlite3
 
-db = 'Babysitter.db'
-db = sqlite3.connect('')
+DB = '----'
 
 
-class MothersDatabase:
-    def __init__(self, db):
-        self.conn = sqlite3.connect(db)
-        self.cur = self.conn.cursor()
-        self.cur.execute('''
-            CREATE TABLE IF NOT EXISTS Famalies (
-                Id               INTEGER       PRIMARY KEY,
-                Mail             TEXT          NOT NULL,
-                "First Name"     TEXT          NOT NULL,
-                "Last Name"      TEXT          NOT NULL,
-                city             INTEGER       NOT NULL,
-                Neighborhood     INTEGER       NOT NULL,
-                Cell             TEXT          NOT NULL,
-                NumOfChildren    INTEGER,
-                OldestChild      INTEGER,
-                YoungestChildren INTEGER,
-                FOREIGN KEY (city) REFERENCES Cities (Id),
-                FOREIGN KEY (Neighborhood) REFERENCES Neighborhoods (Id)
-            );''')
-        self.conn.commit()
+class BaseModel:
+    _cur = None
+
+    def cur(self):
+        if BaseModel._cur == None:
+            BaseModel._cur = self.conn.cursor()
+        return BaseModel._cur
+
+    def __init__(self):
+        if BaseModel._cur != None:
+            raise Exception("You already have cur")
+        else:
+            self.conn = sqlite3.connect(DB)
+            self._cur = self.conn.cursor()
+        self.table = None
+
+    def create(self, data_dic):
+        columns = ', '.join(data_dic.keys())
+        values = ', '.join(["'{}'".format(v) for v in data_dic.values()])
+        query = "INSERT INTO {} ({}) VALUES ({})".format(self.table, columns, values)
+        self.cur.execute(query)
+
+    def read(self, id):
+        self.cur.execute('''SELECT * FROM self.table WHERE id=?''', (id,))
+
+    def delete(self, id):
+        self.cur.execute('''DELETE * FROM self.table WHERE id=?''', (id,))
+
+
+class MothersDatabase(BaseModel):
+
+    def __init__(self):
+        super().__init__()
+        self.table = db.mother  # todo add my table
 
     def create_family(self, mail, firstname, lastname, city, neighborhood, cell, num_of_children, oldest_children,
                       youngest_children):
         self.cur.execute("INSERT INTO Famalies VALUES (NULL,?,?,?,?,?,?,?,?)", (
-        mail, firstname, lastname, city, neighborhood, cell, num_of_children, oldest_children, youngest_children))
+            mail, firstname, lastname, city, neighborhood, cell, num_of_children, oldest_children, youngest_children))
         self.conn.commit()
 
     def read_all_family(self):
@@ -43,15 +56,20 @@ class MothersDatabase:
 
     def update_family(self, id, mail, firstname, lastname, city, neighborhood, cell, num_of_children, oldest_children,
                       youngest_children):
-        self.cur.execute('''UPDATE Famalies 
-                                SET mail=?,firstname=?, lastname=?,city=?,neighborhood=?,
-                                cell=?,num_of_children=?,oldest_children=?,youngest_children=? WHERE id, = ?'''
-                                (mail, firstname, lastname, city, neighborhood, cell, num_of_children, oldest_children, youngest_children, id))
+     # self.cur.execute('''UPDATE Famalies
+      # SET mail=?,firstname=?, lastname=?,city=?,neighborhood=?,
+      # cell=?,num_of_children=?,oldest_children=?,youngest_children=? WHERE id, = ?'''
+       # (mail, firstname, lastname, city, neighborhood, cell, num_of_children, oldest_children,
+        #                  youngest_children, id))
         self.conn.commit()
 
-    def delete_family12(self,id):
+    def delete_family12(self, id):
         self.cur.execute("DELETE FROM Famalies WHERE id=?", (id,))
         self.conn.commit()
 
     def __del__(self):
         self.conn.close()
+
+
+# mom = MothersDatabase()
+# mom.table
