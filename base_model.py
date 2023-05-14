@@ -70,6 +70,6 @@ class MothersDatabase(BaseModel):
     def __del__(self):
         self.conn.close()
 
-
+# בדיקה
 # mom = MothersDatabase()
 # mom.table
