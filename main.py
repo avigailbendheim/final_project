@@ -69,12 +69,14 @@ CREATE TABLE schedule (
 '''
 
 days = '''CREATE TABLE Days(
-    Id INTEGER PRIMARY KEY,,
+    Id INTEGER PRIMARY KEY,
     Name TEXT NOT NULL
     )
 '''
-
-cursor.execute("SELECT * FROM schudule")
+# cursor.execute("insert into schedule ")
+# cursor.execute("""INSERT INTO Babysitters (Mail,FirstName,LastName,YearOfBirth,City,Neighborhood,Seminary,Cell)
+#               VALUES ("y@gmail.com","rina","levi",2002,1,2,"yashan","05845646546") """)
+cursor.execute("select * from Babysitters")
 
 # Commit changes and close connection
 conn.commit()
